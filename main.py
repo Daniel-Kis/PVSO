@@ -1,19 +1,21 @@
 
 
 import cv2 as cv
-import keyboard
 
 cam = cv.VideoCapture(0)
 
-print("Press space to begin")
-keyboard.wait(" ")
-print("Starting")
+x = 1
 
-for x in range(4):
+while x <= 4:
     res, image = cam.read()
     if res:
-        temp = str(x)
-        path = "pic"+temp+".png"
-        cv.imwrite(path, image)
+        cv.imshow("camera", image)
+        if cv.waitKey() == ord(' '):
+            temp = str(x)
+            path = "pic" + temp + ".png"
+            cv.imwrite(path, image)
+            x = x + 1
+            if x > 4:
+                break
     else:
-        print("Error reading the image")
+        print("Error reading from camera")
