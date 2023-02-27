@@ -78,15 +78,27 @@ def main():
     img2 = (img[0:480, 640:1280])
     rows,cols,ht = img2.shape
 
-    # creation of rotation metrix
-    matrix = cv.getRotationMatrix2D((rows/2,cols/2),90,1)
+    # Creating new matrix of same tipe as image img using image helpI.png for help
+    mask2 = (img[0:640, 0:480])
+    cv.imwrite("helpI.png", mask2)
+    mask3 = cv.imread("helpI.png", 1)
 
-    # rotating image and then resize it so it would fit back into original thrue mask2
-    mask2 = cv.warpAffine(img2,matrix,(rows,cols))
-    mask2 = cv.resize(mask2, (640,480))
+    # rotating image and then resize it, so it would fit back into original image through mask3
+    for i in range(rows-1):
+        mask3[:, i] = img2[i, :]
+
+    mask3 = cv.resize(mask3, (640, 480))
+
+    # this is original method
+    # # creation of rotation metrix
+    # matrix = cv.getRotationMatrix2D((rows/2,cols/2),90,1)
+    #
+    # # rotating image and then resize it so it would fit back into original through mask2
+    # mask2 = cv.warpAffine(img2,matrix,(rows,cols))
+    # mask2 = cv.resize(mask2, (640,480))
 
     # replace the second image of original photo with the new one
-    img[0:480, 640:1280] = mask2
+    img[0:480, 640:1280] = mask3
     cv.imshow("output",img)
 
     # saving new image
@@ -121,9 +133,9 @@ def main():
     size = os.path.getsize("mozaik_red_channel_complete_image.png")
 
     # printing information
-    print("data type: "+str(dt)+"\ndimensions X: "+str(cols)+" Y: "+str(rows)+"\nsize: "+str(size))
+    print("data type: "+str(dt)+"\ndimensions X: "+str(cols)+" Y: "+str(rows)+"\nsize: "+str(size)+" B")
 
-    cv.waitKey(0) 
+    cv.waitKey(0)
 
     return 0
 
