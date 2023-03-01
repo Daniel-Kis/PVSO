@@ -35,6 +35,7 @@ def main():
 
                 # if 4 images were taken, break from loop
                 if x > 4:
+                    cv.destroyWindow("camera")
                     break
         # in case of failed read from camera
         else:
@@ -56,6 +57,7 @@ def main():
     # the final mozaik
     cv.imshow("Complete image", complete_image)
     cv.waitKey()
+    cv.destroyWindow("Complete image")
     cv.imwrite("mozaik_complete_image.png", complete_image)
 
     # kernel mask definition
@@ -68,6 +70,7 @@ def main():
     complete_image[0:480, 0:640] = mask
     cv.imshow("Output", complete_image)
     cv.waitKey(0)
+    cv.destroyWindow("Output")
 
     # save the mozaik with masked image
     cv.imwrite("mozaik_mask_complete_image.png", complete_image)
@@ -84,7 +87,7 @@ def main():
     mask3 = cv.imread("helpI.png", 1)
 
     # rotating image and then resize it, so it would fit back into original image through mask3
-    for i in range(rows-1):
+    for i in range(rows):
         mask3[:, i] = img2[i, :]
 
     mask3 = cv.resize(mask3, (640, 480))
@@ -103,8 +106,8 @@ def main():
 
     # saving new image
     cv.imwrite("mozaik_rotated_complete_image.png",img)
-
     cv.waitKey(0)
+    cv.destroyWindow("output")
 
     # Changing color chanel to R
     # reading of image
@@ -122,7 +125,6 @@ def main():
 
     # saving new image
     cv.imwrite("mozaik_red_channel_complete_image.png", img)
-
     cv.waitKey(0)
 
     # terminal output
