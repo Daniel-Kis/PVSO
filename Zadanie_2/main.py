@@ -75,22 +75,36 @@ def main():
     # Reduce the noise to avoid false circle detection
     img_gray = cv.medianBlur(img_gray, 5)
 
-    # Applying Hough Circle Transform
-    rows = img_gray.shape[0]
-    circle_coordinates = cv.HoughCircles(img_gray, cv.HOUGH_GRADIENT, 1, rows / 8, param1=100, param2=30, minRadius=70, maxRadius=150)
+    # Applying Hough Circle Transform with values from sliders
+    def on_change(val):
+        min_radius = cv.getTrackbarPos('min_radius', windowName)
+        max_radius = cv.getTrackbarPos('max_radius', windowName)
+        rows = img_gray.shape[0]
+        circle_coordinates = cv.HoughCircles(img_gray, cv.HOUGH_GRADIENT, 1, rows / 8, param1=100, param2=30, minRadius=min_radius, maxRadius=max_radius)
 
-    # Drawing detected circles
-    if circle_coordinates is not None:
-        circle_coordinates = np.uint16(np.around(circle_coordinates))
-        for i in circle_coordinates[0, :]:
-            center = (i[0], i[1])
-            # circle center
-            cv.circle(img, center, 1, (0, 100, 100), 3)
-            # circle outline
-            radius = i[2]
-            cv.circle(img, center, radius, (255, 0, 255), 3)
+        imageCopy = img.copy()
+        # Drawing detected circles
+        if circle_coordinates is not None:
+            circle_coordinates = np.uint16(np.around(circle_coordinates))
+            for i in circle_coordinates[0, :]:
+                center = (i[0], i[1])
+                # circle center
+                cv.circle(imageCopy, center, 1, (0, 100, 100), 3)
+                # circle outline
+                radius = i[2]
+                cv.circle(imageCopy, center, radius, (255, 0, 255), 3)
 
-    cv.imshow("detected circles", img)
+        cv.imshow(windowName, imageCopy)
+
+
+    # Window for sliders
+    windowName = 'Circle detection'
+
+    # Creating sliders
+    cv.imshow(windowName, img)
+    cv.createTrackbar('min_radius', windowName, 0, 500, on_change)
+    cv.createTrackbar('max_radius', windowName, 0, 500, on_change)
+
     cv.waitKey(0)
 
 if __name__ == '__main__':
