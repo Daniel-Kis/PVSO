@@ -4,6 +4,19 @@ import numpy as np
 import sys
 # from ximea import xiapi
 
+minRadius = 70
+maxRadius = 150
+
+
+def on_changeMaxRadius(val):
+    global maxRadius
+    maxRadius = val
+
+
+def on_changeMinRadius(val):
+    global minRadius
+    minRadius = val
+
 def main():
     # print(cv.getBuildInformation())
 
@@ -62,50 +75,101 @@ def main():
         # cv.imshow("temp", image)
         # cv.waitKey()
 
-
-    # Detection of the circle
-    path2 = "images2/circle3.jpg"
-
-    # Loads an image
-    img = cv.imread(cv.samples.findFile(path2), cv.IMREAD_COLOR)
-
-    # Convert it to gray
-    img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-    # Reduce the noise to avoid false circle detection
-    img_gray = cv.medianBlur(img_gray, 5)
-
-    # Applying Hough Circle Transform with values from sliders
-    def on_change(val):
-        min_radius = cv.getTrackbarPos('min_radius', windowName)
-        max_radius = cv.getTrackbarPos('max_radius', windowName)
-        rows = img_gray.shape[0]
-        circle_coordinates = cv.HoughCircles(img_gray, cv.HOUGH_GRADIENT, 1, rows / 8, param1=100, param2=30, minRadius=min_radius, maxRadius=max_radius)
-
-        imageCopy = img.copy()
-        # Drawing detected circles
-        if circle_coordinates is not None:
-            circle_coordinates = np.uint16(np.around(circle_coordinates))
-            for i in circle_coordinates[0, :]:
-                center = (i[0], i[1])
-                # circle center
-                cv.circle(imageCopy, center, 1, (0, 100, 100), 3)
-                # circle outline
-                radius = i[2]
-                cv.circle(imageCopy, center, radius, (255, 0, 255), 3)
-
-        cv.imshow(windowName, imageCopy)
-
-
-    # Window for sliders
-    windowName = 'Circle detection'
-
-    # Creating sliders
-    cv.imshow(windowName, img)
-    cv.createTrackbar('min_radius', windowName, 0, 500, on_change)
-    cv.createTrackbar('max_radius', windowName, 0, 500, on_change)
-
+    print("If you want proces image press '1' else you want camera press anything else")
+    method = input()
     cv.waitKey(0)
+
+    if method == '1':
+
+
+        # Detection of the circle in picture
+        path2 = "images2/circle3.jpg"
+
+        # Loads an image
+        img = cv.imread(cv.samples.findFile(path2), cv.IMREAD_COLOR)
+
+        # Convert it to gray
+        img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+        # Reduce the noise to avoid false circle detection
+        img_gray = cv.medianBlur(img_gray, 5)
+
+        # Applying Hough Circle Transform with values from sliders
+        def on_change(val):
+            min_radius = cv.getTrackbarPos('min_radius', windowName)
+            max_radius = cv.getTrackbarPos('max_radius', windowName)
+            rows = img_gray.shape[0]
+            circle_coordinates = cv.HoughCircles(img_gray, cv.HOUGH_GRADIENT, 1, rows / 8, param1=100, param2=30, minRadius=min_radius, maxRadius=max_radius)
+
+            imageCopy = img.copy()
+            # Drawing detected circles
+            if circle_coordinates is not None:
+                circle_coordinates = np.uint16(np.around(circle_coordinates))
+                for i in circle_coordinates[0, :]:
+                    center = (i[0], i[1])
+                    # circle center
+                    cv.circle(imageCopy, center, 1, (0, 100, 100), 3)
+                    # circle outline
+                    radius = i[2]
+                    cv.circle(imageCopy, center, radius, (255, 0, 255), 3)
+
+            cv.imshow(windowName, imageCopy)
+
+
+        # Window for sliders
+        windowName = 'Circle detection'
+
+        # Creating sliders
+        cv.imshow(windowName, img)
+        cv.createTrackbar('min_radius', windowName, 0, 500, on_change)
+        cv.createTrackbar('max_radius', windowName, 0, 500, on_change)
+
+        cv.waitKey(0)
+
+    else:
+        # Detection of the circle true camera
+        numOfCircles = 0
+        cam = cv.VideoCapture(0)
+        res, img = cam.read()
+        if res:
+            cv.imshow("camera", img)
+            cv.createTrackbar('minRadius', "camera", 70, 500, on_changeMinRadius)
+            cv.createTrackbar('maxRadius', "camera", 150, 500, on_changeMaxRadius)
+
+        while cv.waitKey() != ord('q'):
+            res, img = cam.read()
+
+            if res:
+                cv.imshow("camera", img)
+
+                # Convert it to gray
+                img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+                # Reduce the noise to avoid false circle detection
+                img_gray = cv.medianBlur(img_gray, 5)
+
+                # Applying Hough Circle Transform
+                rows = img_gray.shape[0]
+                circle_coordinates = cv.HoughCircles(img_gray, cv.HOUGH_GRADIENT, 1, rows / 8, param1=100, param2=30, minRadius=minRadius, maxRadius=maxRadius)
+
+                # Drawing detected circles
+                if circle_coordinates is not None:
+                    circle_coordinates = np.uint16(np.around(circle_coordinates))
+                    for i in circle_coordinates[0, :]:
+                        numOfCircles += 1
+                        if numOfCircles >= 20:
+                            numOfCircles = 0
+                            break
+                        center = (i[0], i[1])
+                        # circle center
+                        cv.circle(img, center, 1, (0, 100, 100), 3)
+                        # circle outline
+                        radius = i[2]
+                        cv.circle(img, center, radius, (255, 0, 255), 3)
+
+            cv.imshow("camera", img)
+            print("minRadius: " + str(minRadius) + '     qmaxRadius: ' + str(maxRadius))
+
 
 if __name__ == '__main__':
     main()
