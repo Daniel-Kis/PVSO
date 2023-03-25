@@ -17,15 +17,30 @@ def laplaceEdgeDetection(img):
     # kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], np.float32)
     # kernel = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]], np.float32)  # <- good
     # kernel = np.array([[-1, 2, -1], [2, -4, 2], [-1, 2, -1]], np.float32)
-    kernel = np.array([[1, 4, 1], [4, -20, 4], [1, 4, 1]], np.float32)  # <- best
+    kernel = np.array([[1, 4, 1], [4, -20, 4], [1, 4, 1]], np.float32)  # <- best, from:
+    # https://www.youtube.com/watch?v=uNP6ZwQ3r6A&ab_channel=FirstPrinciplesofComputerVision
+
 
     # apply the convolution
-    detected_edges = cv.filter2D(img2, -1, kernel)
-    cv.imshow("Detected Edges", detected_edges)
-    cv.waitKey()
-    cv.destroyWindow("Detected Edges")
+    hi, wi = img2.shape
+    hk, wk = kernel.shape
+    image_padded = np.zeros(shape=(hi + hk - 1, wi + wk - 1))
+    image_padded[hk // 3:-hk // 3, wk // 3:-wk // 3] = img2
+    out = np.zeros(shape=img2.shape)
+    for row in range(hi):
+        for col in range(wi):
+            for i in range(hk):
+                for j in range(wk):
+                    out[row, col] += image_padded[row + i, col + j] * kernel[i, j]
 
-    return detected_edges
+    # out = np.clip(out * 255, 0, 255)  # proper [0..255] range
+    # cv.imwrite("temp.png", cv.filter2D(img2, -1, kernel))
+    out = np.array(out, dtype=float)/float(255)  # safe conversion
+    # cv.imshow("Detected Edges", out)
+    # cv.waitKey()
+    # cv.destroyWindow("Detected Edges")
+
+    return out
 
 
 def main():
@@ -45,12 +60,11 @@ def main():
 
     # edge detection with created algorithm
     laplace_edged_picture = laplaceEdgeDetection(src)
-    cv.imwrite("detected_edges.png", laplace_edged_picture)
+    cv.imshow("output", laplace_edged_picture)
+    cv.waitKey()
+    cv.imwrite("detected_edges.png", np.clip(laplace_edged_picture * 255, 0, 255))
 
-    # save inverse of image
-    imagem = cv.bitwise_not(laplace_edged_picture)
-    cv.imwrite("detected_edges_inverse.png", imagem)
-
+    # edge detection with opencv
     # [load]
     # [reduce_noise]
     # Remove noise by blurring with a Gaussian filter
