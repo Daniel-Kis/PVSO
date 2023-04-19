@@ -14,7 +14,8 @@ def laplaceEdgeDetection(img):
     doublePtrPtr = ct.POINTER(doublePtr)
 
     # load dll
-    dll = ct.CDLL('C:\\Users\\Dano\\PycharmProjects\\PVSO_Zadanie3\\convolution.dll')   # path to dll
+    # dll = ct.CDLL('C:\\Users\\Dano\\PycharmProjects\\PVSO_Zadanie3\\convolution.dll')   # path to dll
+    dll = ct.CDLL('C:\\Users\\Lenovo\\PycharmProjects\\PVSO_zad1\\Zadanie_3\\convolution.dll')  # path to dll
     dllFuncConvolute = dll.convolute    # function name
     dllFuncConvolute.argtypes = [doublePtrPtr, doublePtrPtr, ct.c_int, ct.c_int, ct.c_int, ct.c_int]     # inputs
     dllFuncConvolute.restype = doublePtrPtr     # output
