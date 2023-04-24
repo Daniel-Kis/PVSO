@@ -3,8 +3,8 @@ import numpy as np
 import open3d as o3d
 import os
 import sys
-# sys.path.append('')
-# import open3d_tutorial as o3dtud
+from sklearn.cluster import Birch
+import matplotlib.pyplot as plt
 
 # def display_inlier_outlier(cloud, ind):
 #     inlier_cloud = cloud.select_down_sample(ind)
@@ -15,11 +15,12 @@ import sys
 #     o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud])
 #     return ()
 
+
 def main():
     # dano location "C:\\Users\\Dano\\PycharmProjects\\Zadanie4\\my_pts.ply"
     # martin location "C:\\Users\\Lenovo\\PycharmProjects\\PVSO_zad1\\Zadanie_4\\my_pts.ply"
-    cloud_kinect = o3d.io.read_point_cloud("C:\\Users\\Lenovo\\PycharmProjects\\PVSO_zad1\\Zadanie_4\\my_pts.ply")
-    cloud_downloaded = o3d.io.read_point_cloud("C:\\Users\\Lenovo\\PycharmProjects\\PVSO_zad1\\Zadanie_4\\hmmPLY.ply")
+    cloud_kinect = o3d.io.read_point_cloud("C:\\Users\\Dano\\PycharmProjects\\Zadanie4\\my_pts.ply")
+    cloud_downloaded = o3d.io.read_point_cloud("C:\\Users\\Dano\\PycharmProjects\\Zadanie4\\hmmPLY.ply")
     o3d.visualization.draw_geometries([cloud_kinect])
     o3d.visualization.draw_geometries([cloud_downloaded])
 
@@ -56,10 +57,19 @@ def main():
     # display_inlier_outlier(cloud_downloaded, ind)
     o3d.visualization.draw_geometries([cloud_downloaded_removed])
 
+    # Birch
+    model = Birch(branching_factor=50, n_clusters=5, threshold=0.5)
+    data = np.asarray(cloud_kinect_removed.points)
+    model.fit(data)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+
+    pred = model.predict(data)
+    ax.scatter(data[:, 0], data[:, 1], data[:, 2], c=pred)
+    plt.show()
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
