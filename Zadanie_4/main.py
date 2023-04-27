@@ -5,6 +5,11 @@ import os
 import sys
 from sklearn.cluster import Birch
 import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+from sklearn.cluster import KMeans
+from sklearn.cluster import DBSCAN
 
 # def display_inlier_outlier(cloud, ind):
 #     inlier_cloud = cloud.select_down_sample(ind)
@@ -19,8 +24,8 @@ import matplotlib.pyplot as plt
 def main():
     # dano location "C:\\Users\\Dano\\PycharmProjects\\Zadanie4\\my_pts.ply"
     # martin location "C:\\Users\\Lenovo\\PycharmProjects\\PVSO_zad1\\Zadanie_4\\my_pts.ply"
-    cloud_kinect = o3d.io.read_point_cloud("C:\\Users\\Dano\\PycharmProjects\\Zadanie4\\my_pts.ply")
-    cloud_downloaded = o3d.io.read_point_cloud("C:\\Users\\Dano\\PycharmProjects\\Zadanie4\\hmmPLY.ply")
+    cloud_kinect = o3d.io.read_point_cloud("C:\\Users\\Lenovo\\PycharmProjects\\PVSO_zad1\\Zadanie_4\\my_pts.ply")
+    cloud_downloaded = o3d.io.read_point_cloud("C:\\Users\\Lenovo\\PycharmProjects\\PVSO_zad1\\Zadanie_4\\hmmPLY.ply")
     o3d.visualization.draw_geometries([cloud_kinect])
     o3d.visualization.draw_geometries([cloud_downloaded])
 
@@ -69,6 +74,18 @@ def main():
     ax.scatter(data[:, 0], data[:, 1], data[:, 2], c=pred)
     plt.show()
 
+    # k-menas
+    K = 15  # number of clusters
+    model2 = KMeans(K)
+    data2 = np.asarray(cloud_kinect_removed.points)
+    model2.fit(data2)
+
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot(projection='3d')
+
+    pred = model2.predict(data2)
+    ax2.scatter(data2[:, 0], data2[:, 1], data2[:, 2], c=pred)
+    plt.show()
 
 if __name__ == '__main__':
     main()
